@@ -1,0 +1,23 @@
+{
+  "name": "schoenef/graph-hopper-connector-bundle",
+  "type": "symfony-bundle",
+  "description": "Allows to use the GraphHopper geocoding api at https://graphhopper.com/api/1/docs/geocoding/.",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Andreas Schönefeldt",
+      "email": "schoenefeldt.andreas@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Schoenef\\PhotonOsmConnectorBundle\\": ""
+    }
+  },
+  "require": {
+    "php": ">=5.6",
+    "symfony/framework-bundle": ">=2",
+    "guzzlehttp/guzzle": "~6.0"
+  }
+}
+
