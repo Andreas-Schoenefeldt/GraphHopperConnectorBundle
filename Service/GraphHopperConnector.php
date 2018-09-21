@@ -41,7 +41,7 @@ class GraphHopperConnector {
      *
      * @param $name
      * @param array $filter the filter allows to reduce the results to certain types
-     * @return array
+     * @return array|bool
      */
     public function searchLocation ($name, $filter = []) {
         $options = [];
@@ -72,7 +72,7 @@ class GraphHopperConnector {
             return $this->filterResult(json_decode($response->getBody()->getContents(), true)['hits'], $filter);
         }
 
-        return [];
+        return false;
     }
 
 
