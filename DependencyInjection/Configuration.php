@@ -24,12 +24,18 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface {
     const KEY_TIMEOUT = 'timeout';
+    const KEY_API_KEY = 'api_key';
     const KEY_API_HOST = 'host';
     const KEY_LANG = 'lang';
+    const KEY_COUNTRY = 'country';
+    const KEY_PROVIDER = 'provider';
+    const KEY_AUTOCOMPLETE = 'autocomplete';
 
-    const API_HOST_DEFAULT = 'https://photon.komoot.de/api/';
+    const API_HOST_DEFAULT = 'https://graphhopper.com';
 
     const CONFIG_NAMESPACE = 'graph_hopper_connector';
+
+    const PROVIDER_GISGRAPHY = 'gisgraphy';
 
     /**
      * {@inheritdoc}
@@ -42,9 +48,13 @@ class Configuration implements ConfigurationInterface {
 
         $rootNode
             ->children()
-                ->enumNode(self::KEY_LANG)->values(['en', 'de', 'fr', 'es', 'ru'])->defaultValue('en')->end()
-                ->scalarNode(self::KEY_API_HOST)->defaultValue(self::API_HOST_DEFAULT)->end()
-                ->integerNode(self::KEY_TIMEOUT)->defaultValue(20)->end()
+            ->scalarNode(self::KEY_API_KEY)->isRequired()->end()
+            ->scalarNode(self::KEY_COUNTRY)->end()
+            ->booleanNode(self::KEY_AUTOCOMPLETE)->defaultValue(false)->end()
+            ->enumNode(self::KEY_LANG)->values(['en', 'de', 'fr', 'es', 'ru'])->defaultValue('en')->end()
+            ->enumNode(self::KEY_PROVIDER)->values(['default', 'nominatim', 'opencagedata', self::PROVIDER_GISGRAPHY])->defaultValue('default')->end()
+            ->scalarNode(self::KEY_API_HOST)->defaultValue(self::API_HOST_DEFAULT)->end()
+            ->integerNode(self::KEY_TIMEOUT)->defaultValue(20)->end()
             ->end();
         return $treeBuilder;
     }

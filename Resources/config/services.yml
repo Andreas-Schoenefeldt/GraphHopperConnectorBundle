@@ -1,4 +1,4 @@
 services:
   graph_hopper.connector:
     class: Schoenef\GraphHopperConnectorBundle\Service\GraphHopperConnector
-    arguments: ['%schoenef_graph_hopper_connector%']
+    arguments: ['%graph_hopper_connector%']

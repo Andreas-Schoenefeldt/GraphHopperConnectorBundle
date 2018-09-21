@@ -4,7 +4,7 @@ namespace Schoenef\GraphHopperConnectorBundle\Service;
 
 
 use GuzzleHttp\Client;
-use Schoenef\PhotonOsmConnectorBundle\DependencyInjection\Configuration;
+use Schoenef\GraphHopperConnectorBundle\DependencyInjection\Configuration;
 
 class GraphHopperConnector {
 
@@ -13,6 +13,10 @@ class GraphHopperConnector {
     private $client;
 
     private $lang;
+    private $country;
+    private $provider;
+    private $autocomplete;
+    private $key;
 
     public function __construct(array $connectorConfig){
         $this->config = $connectorConfig;
@@ -25,6 +29,10 @@ class GraphHopperConnector {
         ]);
 
         $this->lang = $this->config[Configuration::KEY_LANG];
+        $this->country = $this->config[Configuration::KEY_COUNTRY];
+        $this->provider = $this->config[Configuration::KEY_PROVIDER];
+        $this->provider = $this->config[Configuration::KEY_PROVIDER];
+        $this->key = $this->config[Configuration::KEY_API_KEY];
     }
 
 
@@ -36,13 +44,27 @@ class GraphHopperConnector {
     public function searchLocation ($name, $filter = []) {
         $options = [];
 
+        $options['provider'] = $this->provider;
+        $options['key'] = $this->key;
+
         if ($this->lang) {
             $options['lang'] = $this->lang;
         }
 
+        if ($this->country) {
+            $options['country'] = $this->country;
+        }
+
+        // autocomplete is only available for gisgraphy
+        if ($this->provider === Configuration::PROVIDER_GISGRAPHY && $this->autocomplete) {
+            $options['autocomplete'] = 'true';
+        }
+
         $options['q'] = $name;
 
-        $response = $this->client->request('GET', '',['query' => $options]);
+        // https://graphhopper.com/api/1/geocode?q=berlin&locale=de&country=DE&autocomplete=true&key=7bd83ec8-fcda-45dc-957e-c1f66376ea1a&provider=gisgraphy
+
+        $response = $this->client->request('GET', '/api/1/geocode',['query' => $options]);
 
         if ($response->getStatusCode() == '200') {
             return $this->filterResult(json_decode($response->getBody()->getContents(), true)['features'], $filter);

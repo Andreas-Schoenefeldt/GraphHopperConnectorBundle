@@ -52,10 +52,10 @@ Add the following configuration to your ```app/config/config.yml```:
 ```yml
 graph_hopper_connector:
   timeout: 20
-  apiKey: 'your key'
+  api_key: "%your-key%"
   lang: de
   country: DE
-  provider: 'gisgraphy'
+  provider: "gisgraphy"
   autocomplete: true
 ```
 
