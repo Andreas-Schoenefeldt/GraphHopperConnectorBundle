@@ -31,7 +31,7 @@ class GraphHopperConnector {
         $this->lang = $this->config[Configuration::KEY_LANG];
         $this->country = $this->config[Configuration::KEY_COUNTRY];
         $this->provider = $this->config[Configuration::KEY_PROVIDER];
-        $this->provider = $this->config[Configuration::KEY_PROVIDER];
+        $this->autocomplete = $this->config[Configuration::KEY_AUTOCOMPLETE];
         $this->key = $this->config[Configuration::KEY_API_KEY];
     }
 
@@ -65,9 +65,7 @@ class GraphHopperConnector {
         $options['q'] = $name;
 
         // https://graphhopper.com/api/1/geocode?q=berlin&locale=de&country=DE&autocomplete=true&key=7bd83ec8-fcda-45dc-957e-c1f66376ea1a&provider=gisgraphy
-
         $response = $this->client->request('GET', '/api/1/geocode',['query' => $options]);
-
         if ($response->getStatusCode() == '200') {
             return $this->filterResult(json_decode($response->getBody()->getContents(), true)['hits'], $filter);
         }
