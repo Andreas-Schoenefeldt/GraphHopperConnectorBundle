@@ -37,6 +37,8 @@ class GraphHopperConnector {
 
 
     /**
+     * this function will convert the graphhopper result to geojson http://geojson.org/
+     *
      * @param $name
      * @param array $filter the filter allows to reduce the results to certain types
      * @return array
@@ -67,28 +69,72 @@ class GraphHopperConnector {
         $response = $this->client->request('GET', '/api/1/geocode',['query' => $options]);
 
         if ($response->getStatusCode() == '200') {
-            return $this->filterResult(json_decode($response->getBody()->getContents(), true)['features'], $filter);
+            return $this->filterResult(json_decode($response->getBody()->getContents(), true)['hits'], $filter);
         }
 
         return [];
     }
 
 
-    public function filterResult ($featuresArray, $filter = []) {
+    public function filterResult ($hitsArray, $filter = []) {
 
 
         foreach ($filter as $key => $allowedValues) {
             $filteredResult = [];
-            foreach ($featuresArray as $entry) {
+            foreach ($hitsArray as $entry) {
+
+                $entry = $this->convertToGeoJSON($entry);
+
                 if (array_key_exists($key, $entry['properties']) && in_array($entry['properties'][$key], $allowedValues)) {
                     $filteredResult[] = $entry;
                 }
             }
 
-            $featuresArray = $filteredResult;
+            $hitsArray = $filteredResult;
         }
 
-        return $featuresArray;
+        return $hitsArray;
+    }
+
+    public function convertToGeoJSON ($entry) {
+        $geoEntry = [
+            "type" => "Feature",
+            "geometry" => [
+                "type" => "Point",
+                "coordinates" => []
+            ],
+            "properties" => []
+        ];
+
+        foreach ($entry as $attr => $val) {
+            switch ($attr) {
+                default:
+                    $geoEntry['properties'][$attr] = $val;
+                    break;
+                case 'point':
+                    $geoEntry['geometry']['coordinates'] = [ $val['lng'], $val['lat'] ];
+                    break;
+            }
+        }
+
+        if ($this->provider === Configuration::PROVIDER_GISGRAPHY) {
+            // gisgraphy can do autocomplete, but has a super limited result set
+
+            if (!array_key_exists('name', $entry)) {
+                // this is a full auto complete set, let's see what we got
+
+                if (!array_key_exists('city', $entry)) {
+                    $geoEntry['properties']['name'] = $entry['street'];
+                    $geoEntry['properties']['city'] = $entry['street'];
+                    unset($geoEntry['properties']['street']);
+
+                }
+
+            }
+
+        }
+
+        return $geoEntry;
     }
 
 }

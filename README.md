@@ -3,6 +3,8 @@ Allows to use the GraphHopper geocoding api at https://graphhopper.com/api/1/doc
 
 you'll need an API key to use this service. It is just an easy wrapper to actually have access in the symfony context to this.
 
+The Bundle converts the resut of the graphhopper API to [geojson](http://geojson.org/) in order to allow it to work seamlessly with other apis. 
+
 ## Installation
 
 ### Step 1: Download the Bundle
