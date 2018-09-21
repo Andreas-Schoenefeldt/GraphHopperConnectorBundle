@@ -78,19 +78,25 @@ class GraphHopperConnector {
 
     public function filterResult ($hitsArray, $filter = []) {
 
+        if (count($filter)) {
+            foreach ($filter as $key => $allowedValues) {
+                $filteredResult = [];
+                foreach ($hitsArray as $entry) {
 
-        foreach ($filter as $key => $allowedValues) {
-            $filteredResult = [];
-            foreach ($hitsArray as $entry) {
+                    $entry = $this->convertToGeoJSON($entry);
 
-                $entry = $this->convertToGeoJSON($entry);
-
-                if (array_key_exists($key, $entry['properties']) && in_array($entry['properties'][$key], $allowedValues)) {
-                    $filteredResult[] = $entry;
+                    if (array_key_exists($key, $entry['properties']) && in_array($entry['properties'][$key], $allowedValues)) {
+                        $filteredResult[] = $entry;
+                    }
                 }
-            }
 
-            $hitsArray = $filteredResult;
+                $hitsArray = $filteredResult;
+            }
+        } else {
+            // we still need to convert this into geoJson ;)
+            foreach ($hitsArray as $index => $entry) {
+                $hitsArray[$index] = $this->convertToGeoJSON($entry);
+            }
         }
 
         return $hitsArray;
